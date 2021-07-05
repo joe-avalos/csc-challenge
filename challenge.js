@@ -1,4 +1,4 @@
-module.exports = function sortCategoriesForInsert(inputJson) {
+module.exports =function sortCategoriesForInsert(inputJson) {
   if (inputJson.length === 1) return inputJson;
   const result = [];
   const heads = [];
@@ -15,22 +15,20 @@ module.exports = function sortCategoriesForInsert(inputJson) {
       heads.push(item);
     }
   });
+  const recurseHelper = (children) => {
+    if (children === undefined) return;
+    for (let i = 0; i < children.length; i++) {
+      let child = children[i];
+      result.push(child);
+      let next = parentMap.get(child.id);
+      recurseHelper(next, parentMap, result);
+    }
+  };
 
   heads.forEach((head) => {
     result.push(head);
     let children = parentMap.get(head.id);
-    result.push(...recurseHelper(children, parentMap));
+    recurseHelper(children, parentMap);
   });
   return result;
-};
-
-const recurseHelper = (children, parentMap, result = []) => {
-  if (children === undefined) return;
-  for (let i = 0; i < children.length; i++) {
-    let child = children[i];
-    result.push(child);
-    let next = parentMap.get(child.id);
-    recurseHelper(next, parentMap, result);
-  }
-  return result;
-};
+}
